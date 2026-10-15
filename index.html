@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>数独マスター (Sudoku Master)</title>
+    <title>数独マスター (Sudoku Master - 10k Edition)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -64,7 +64,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                 </svg>
-                <span>問題リスト</span>
+                <span>問題リスト (10k)</span>
             </button>
             <button id="new-game-btn" class="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-sm font-medium shadow hover:bg-blue-600 transition active:scale-95 flex items-center space-x-1">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -192,46 +192,44 @@
 
     </main>
 
-    <!-- Difficulty Selection Modal -->
     <div id="difficulty-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl relative">
             <button id="close-diff-modal-btn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-xl hidden">&times;</button>
-            <h2 class="text-xl font-bold text-slate-800 mb-4 text-center">難易度を選択</h2>
+            <h2 class="text-xl font-bold text-slate-800 mb-4 text-center">難易度を選択 (全10,000問)</h2>
             <div class="space-y-2.5">
                 <button class="difficulty-option w-full py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold rounded-xl border border-emerald-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="easy">
-                    <span>簡単 (Easy)</span>
+                    <span>簡単 (Easy: #1001〜#3500)</span>
                     <span class="text-xs bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full">Lv. 1</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold rounded-xl border border-blue-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="normal">
-                    <span>普通 (Normal)</span>
+                    <span>普通 (Normal: #3501〜#6000)</span>
                     <span class="text-xs bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full">Lv. 3</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold rounded-xl border border-amber-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="hard">
-                    <span>難しい (Hard)</span>
+                    <span>難しい (Hard: #6001〜#8500)</span>
                     <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">Lv. 6</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-purple-50 hover:bg-purple-100 text-purple-800 font-semibold rounded-xl border border-purple-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="expert">
-                    <span>高難度 (Expert)</span>
+                    <span>高難度 (Expert: #8501〜#11000)</span>
                     <span class="text-xs bg-purple-200 text-purple-900 px-2 py-0.5 rounded-full">Lv. 8</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-rose-50 hover:bg-rose-100 text-rose-800 font-semibold rounded-xl border border-rose-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="master">
-                    <span>激ムズ (Master)</span>
+                    <span>激ムズ (Master: #11001〜#13500)</span>
                     <span class="text-xs bg-rose-200 text-rose-900 px-2 py-0.5 rounded-full">Lv. 10</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Puzzle Select / History Modal -->
     <div id="puzzle-select-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-        <div class="bg-white rounded-2xl p-5 w-full max-w-md shadow-2xl flex flex-col max-h-[85vh]">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-lg shadow-2xl flex flex-col max-h-[88vh]">
             <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800">問題リスト・実績</h2>
+                <h2 class="text-lg font-bold text-slate-800">10,000問 問題リスト & 実績</h2>
                 <button id="close-puzzle-modal" class="text-slate-400 hover:text-slate-600 font-bold text-xl p-1">&times;</button>
             </div>
             
-            <!-- Category Tabs -->
-            <div class="grid grid-cols-5 gap-1 mb-3 bg-slate-100 p-1 rounded-xl">
+            <!-- Category Tabs (5 levels, each 2500 puzzles) -->
+            <div class="grid grid-cols-5 gap-1 mb-2 bg-slate-100 p-1 rounded-xl">
                 <button class="tab-btn py-1.5 text-[11px] font-bold rounded-lg text-slate-600 bg-white shadow-sm" data-tab="easy">簡単</button>
                 <button class="tab-btn py-1.5 text-[11px] font-bold rounded-lg text-slate-600" data-tab="normal">普通</button>
                 <button class="tab-btn py-1.5 text-[11px] font-bold rounded-lg text-slate-600" data-tab="hard">難しい</button>
@@ -239,19 +237,25 @@
                 <button class="tab-btn py-1.5 text-[11px] font-bold rounded-lg text-slate-600" data-tab="master">激ムズ</button>
             </div>
 
+            <!-- Pagination bar (100 puzzles per page -> 25 pages per difficulty) -->
+            <div class="flex items-center justify-between bg-slate-50 px-3 py-1.5 rounded-lg mb-2 text-xs text-slate-600">
+                <button id="prev-page-btn" class="px-2.5 py-1 bg-white border border-slate-200 rounded font-semibold hover:bg-slate-100 active:scale-95 disabled:opacity-40">前へ</button>
+                <span id="page-info" class="font-mono font-bold">ページ 1 / 25 (#1001〜#1100)</span>
+                <button id="next-page-btn" class="px-2.5 py-1 bg-white border border-slate-200 rounded font-semibold hover:bg-slate-100 active:scale-95 disabled:opacity-40">次へ</button>
+            </div>
+
             <!-- Puzzle Grid / List -->
-            <div id="puzzle-list-container" class="flex-1 overflow-y-auto grid grid-cols-2 gap-2 p-1 min-h-[250px]">
+            <div id="puzzle-list-container" class="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2 p-1 min-h-[300px]">
                 <!-- Dynamically Generated Puzzle Cards -->
             </div>
 
             <div class="mt-3 pt-2 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
-                <span id="cleared-stats-summary">クリア済み: 0 問</span>
+                <span id="cleared-stats-summary">総クリア済み: 0 / 10,000 問</span>
                 <button id="reset-history-btn" class="text-rose-500 hover:underline">クリア記録リセット</button>
             </div>
         </div>
     </div>
 
-    <!-- Application Logic -->
     <script>
         let solution = [];
         let puzzle = [];
@@ -268,13 +272,14 @@
         let timerInterval = null;
         let isPaused = false;
         let isGameOver = false;
-        let currentDifficulty = 'normal';
-        let currentPuzzleId = '#2001';
+        let currentDifficulty = 'easy';
+        let currentPuzzleId = '#1001';
+        let activeTab = 'easy';
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 100; // 100 puzzles per page (25 pages total for 2500 puzzles)
 
         // LocalStorage for cleared puzzles
-        let clearedPuzzles = JSON.parse(localStorage.getItem('sudoku_cleared_puzzles') || '{}');
-
-        const SEED_COUNT = 30; // 30 fixed seeds per difficulty category
+        let clearedPuzzles = JSON.parse(localStorage.getItem('sudoku_10k_cleared_puzzles') || '{}');
 
         const boardEl = document.getElementById('sudoku-board');
         const timerDisplay = document.getElementById('timer-display');
@@ -302,6 +307,9 @@
         const clearedStatsSummary = document.getElementById('cleared-stats-summary');
         const resetHistoryBtn = document.getElementById('reset-history-btn');
         const closeDiffModalBtn = document.getElementById('close-diff-modal-btn');
+        const prevPageBtn = document.getElementById('prev-page-btn');
+        const nextPageBtn = document.getElementById('next-page-btn');
+        const pageInfo = document.getElementById('page-info');
 
         // Pseudo-random generator using seed string
         function mulberry32(a) {
@@ -314,7 +322,7 @@
         }
 
         function getSeedFromId(idStr) {
-            let num = parseInt(idStr.replace('#', ''), 10) || 1000;
+            let num = parseInt(idStr.replace('#', ''), 10) || 1001;
             return num * 15485863;
         }
 
@@ -336,17 +344,25 @@
         function generateSudoku(difficulty, targetPuzzleId = null) {
             if (targetPuzzleId) {
                 currentPuzzleId = targetPuzzleId;
+                currentDifficulty = difficulty;
             } else {
-                const diffOffsets = { easy: 1000, normal: 2000, hard: 3000, expert: 4000, master: 5000 };
-                const baseId = diffOffsets[difficulty] || 2000;
+                const diffRanges = { 
+                    easy: { start: 1001, count: 2500 }, 
+                    normal: { start: 3501, count: 2500 }, 
+                    hard: { start: 6001, count: 2500 }, 
+                    expert: { start: 8501, count: 2500 }, 
+                    master: { start: 11001, count: 2500 } 
+                };
+                const range = diffRanges[difficulty] || diffRanges.easy;
                 let attempts = 0;
                 let candidateId = '';
                 do {
-                    const randomNum = baseId + Math.floor(Math.random() * SEED_COUNT) + 1;
+                    const randomNum = range.start + Math.floor(Math.random() * range.count);
                     candidateId = '#' + randomNum;
                     attempts++;
-                } while (clearedPuzzles[candidateId] && attempts < 100);
+                } while (clearedPuzzles[candidateId] && attempts < 150);
                 currentPuzzleId = candidateId;
+                currentDifficulty = difficulty;
             }
 
             const rng = mulberry32(getSeedFromId(currentPuzzleId));
@@ -382,13 +398,14 @@
             solveSudokuSeeded(base);
             solution = [...base];
 
+            // Determine clue count based on difficulty
             let removeCount = 40;
             let levelText = "Lv. 3 普通";
-            if (difficulty === 'easy') { removeCount = 32; levelText = "Lv. 1 簡単"; }
-            else if (difficulty === 'normal') { removeCount = 40; levelText = "Lv. 3 普通"; }
-            else if (difficulty === 'hard') { removeCount = 48; levelText = "Lv. 6 難しい"; }
-            else if (difficulty === 'expert') { removeCount = 54; levelText = "Lv. 8 高難度"; }
-            else if (difficulty === 'master') { removeCount = 58; levelText = "Lv. 10 激ムズ"; }
+            if (currentDifficulty === 'easy') { removeCount = 34; levelText = "Lv. 1 簡単"; }
+            else if (currentDifficulty === 'normal') { removeCount = 42; levelText = "Lv. 3 普通"; }
+            else if (currentDifficulty === 'hard') { removeCount = 50; levelText = "Lv. 6 難しい"; }
+            else if (currentDifficulty === 'expert') { removeCount = 56; levelText = "Lv. 8 高難度"; }
+            else if (currentDifficulty === 'master') { removeCount = 60; levelText = "Lv. 10 激ムズ"; }
 
             document.getElementById('level-display').textContent = levelText;
             document.getElementById('puzzle-id').textContent = currentPuzzleId;
@@ -469,7 +486,7 @@
         playAgainBtn.addEventListener('click', () => {
             winOverlay.classList.add('hidden');
             puzzleSelectModal.classList.remove('hidden');
-            renderPuzzleList(activeTab);
+            renderPuzzleList(activeTab, currentPage);
         });
 
         multiSelectBtn.addEventListener('click', () => {
@@ -695,27 +712,41 @@
                 time: timerDisplay.textContent,
                 timestamp: Date.now()
             };
-            localStorage.setItem('sudoku_cleared_puzzles', JSON.stringify(clearedPuzzles));
+            localStorage.setItem('sudoku_10k_cleared_puzzles', JSON.stringify(clearedPuzzles));
 
             winTime.textContent = `タイム: ${timerDisplay.textContent}`;
             winOverlay.classList.remove('hidden');
         }
 
-        let activeTab = 'normal';
+        const diffRangesConfig = {
+            easy: { start: 1001, total: 2500 },
+            normal: { start: 3501, total: 2500 },
+            hard: { start: 6001, total: 2500 },
+            expert: { start: 8501, total: 2500 },
+            master: { start: 11001, total: 2500 }
+        };
 
-        function renderPuzzleList(diff) {
+        function renderPuzzleList(diff, page) {
             puzzleListContainer.innerHTML = '';
-            const diffOffsets = { easy: 1000, normal: 2000, hard: 3000, expert: 4000, master: 5000 };
-            const baseId = diffOffsets[diff] || 2000;
+            const config = diffRangesConfig[diff];
+            const maxPages = Math.ceil(config.total / ITEMS_PER_PAGE);
+            if (page < 1) page = 1;
+            if (page > maxPages) page = maxPages;
+            currentPage = page;
 
-            let clearedCount = 0;
-            for (let i = 1; i <= SEED_COUNT; i++) {
-                const puzzleId = '#' + (baseId + i);
+            const startIndex = config.start + (page - 1) * ITEMS_PER_PAGE;
+            const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, config.start + config.total);
+
+            pageInfo.textContent = `ページ ${page} / ${maxPages} (#${startIndex}〜#${endIndex - 1})`;
+            prevPageBtn.disabled = page === 1;
+            nextPageBtn.disabled = page === maxPages;
+
+            for (let idNum = startIndex; idNum < endIndex; idNum++) {
+                const puzzleId = '#' + idNum;
                 const isCleared = !!clearedPuzzles[puzzleId];
-                if (isCleared) clearedCount++;
 
                 const card = document.createElement('div');
-                card.className = `p-3 rounded-xl border flex flex-col justify-between transition ${
+                card.className = `p-2.5 rounded-xl border flex flex-col justify-between transition ${
                     isCleared 
                         ? 'bg-slate-100 border-slate-300 opacity-75' 
                         : 'bg-white border-slate-200 hover:border-blue-400 hover:shadow-md cursor-pointer'
@@ -723,30 +754,29 @@
 
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-1">
-                        <span class="font-mono font-bold text-sm ${isCleared ? 'text-slate-500' : 'text-slate-800'}">${puzzleId}</span>
-                        ${isCleared ? '<span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full">★ CLEAR</span>' : '<span class="text-[10px] font-semibold bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">未挑戦</span>'}
+                        <span class="font-mono font-bold text-xs ${isCleared ? 'text-slate-500' : 'text-slate-800'}">${puzzleId}</span>
+                        ${isCleared ? '<span class="text-[9px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full">CLEAR</span>' : '<span class="text-[9px] font-semibold bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">未挑戦</span>'}
                     </div>
-                    <div class="text-xs text-slate-500 flex justify-between items-end mt-1">
-                        <span>タイム: ${isCleared ? clearedPuzzles[puzzleId].time : '--:--'}</span>
-                        <button class="px-2 py-1 text-xs rounded font-semibold ${
+                    <div class="text-[11px] text-slate-500 flex justify-between items-end mt-1">
+                        <span>${isCleared ? clearedPuzzles[puzzleId].time : '--:--'}</span>
+                        <button class="px-2 py-0.5 text-[10px] rounded font-semibold ${
                             isCleared 
                                 ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
                                 : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95'
                         }" ${isCleared ? 'disabled' : ''}>
-                            ${isCleared ? 'クリア済' : '挑戦する'}
+                            ${isCleared ? '済' : '挑戦'}
                         </button>
                     </div>
                 `;
 
                 if (!isCleared) {
                     card.addEventListener('click', () => {
-                        currentDifficulty = diff;
                         puzzleSelectModal.classList.add('hidden');
                         isGameOver = false;
                         isPaused = false;
                         pauseOverlay.classList.add('hidden');
                         winOverlay.classList.add('hidden');
-                        generateSudoku(currentDifficulty, puzzleId);
+                        generateSudoku(diff, puzzleId);
                         renderBoard();
                         startTimer();
                     });
@@ -756,8 +786,22 @@
             }
 
             const totalCleared = Object.keys(clearedPuzzles).length;
-            clearedStatsSummary.textContent = `総クリア数: ${totalCleared} 問`;
+            clearedStatsSummary.textContent = `総クリア済み: ${totalCleared} / 10,000 問`;
         }
+
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                renderPuzzleList(activeTab, currentPage - 1);
+            }
+        });
+
+        nextPageBtn.addEventListener('click', () => {
+            const config = diffRangesConfig[activeTab];
+            const maxPages = Math.ceil(config.total / ITEMS_PER_PAGE);
+            if (currentPage < maxPages) {
+                renderPuzzleList(activeTab, currentPage + 1);
+            }
+        });
 
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -767,12 +811,13 @@
                 });
                 btn.classList.add('bg-white', 'shadow-sm', 'text-slate-800');
                 activeTab = btn.dataset.tab;
-                renderPuzzleList(activeTab);
+                currentPage = 1;
+                renderPuzzleList(activeTab, currentPage);
             });
         });
 
         selectPuzzleBtn.addEventListener('click', () => {
-            renderPuzzleList(activeTab);
+            renderPuzzleList(activeTab, currentPage);
             puzzleSelectModal.classList.remove('hidden');
         });
 
@@ -783,8 +828,8 @@
         resetHistoryBtn.addEventListener('click', () => {
             if (confirm('全てのクリア記録をリセットしてもよろしいですか？')) {
                 clearedPuzzles = {};
-                localStorage.removeItem('sudoku_cleared_puzzles');
-                renderPuzzleList(activeTab);
+                localStorage.removeItem('sudoku_10k_cleared_puzzles');
+                renderPuzzleList(activeTab, currentPage);
             }
         });
 
@@ -799,13 +844,13 @@
 
         document.querySelectorAll('.difficulty-option').forEach(btn => {
             btn.addEventListener('click', () => {
-                currentDifficulty = btn.dataset.level;
+                const diff = btn.dataset.level;
                 difficultyModal.classList.add('hidden');
                 isGameOver = false;
                 isPaused = false;
                 pauseOverlay.classList.add('hidden');
                 winOverlay.classList.add('hidden');
-                generateSudoku(currentDifficulty);
+                generateSudoku(diff);
                 renderBoard();
                 startTimer();
             });
@@ -882,8 +927,7 @@
         }
 
         window.onload = function() {
-            renderPuzzleList(activeTab);
-            generateSudoku('normal', '#2001');
+            generateSudoku('easy', '#1001');
             renderBoard();
             startTimer();
         };
