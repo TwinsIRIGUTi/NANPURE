@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>数独マスター (Sudoku Master - 10k Edition)</title>
+    <title>TWINS SUDOKU (10k Edition)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -42,8 +42,57 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 h-screen w-screen overflow-hidden flex flex-col justify-between select-none">
+<body class="bg-slate-100 text-slate-800 h-screen w-screen overflow-hidden flex flex-col justify-between select-none relative">
 
+    <!-- ==================== TITLE SCREEN OVERLAY ==================== -->
+    <div id="title-screen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-between p-8 text-white">
+        <div class="flex-1 flex flex-col items-center justify-center text-center space-y-4">
+            <!-- Large Title -->
+            <h1 class="text-4xl sm:text-6xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 drop-shadow-lg">
+                TWINS SUDOKU
+            </h1>
+            <p class="text-sm sm:text-base text-slate-400 font-medium tracking-widest">
+                10,000 PUZZLES CHALLENGE
+            </p>
+
+            <!-- Decorative Sudoku Grid Icon -->
+            <div class="w-24 h-24 sm:w-32 sm:32 my-6 grid grid-cols-3 gap-1 p-2 bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl">
+                <div class="bg-blue-500/20 border border-blue-400/40 rounded flex items-center justify-center font-bold text-blue-300 text-lg">9</div>
+                <div class="bg-slate-700/50 rounded"></div>
+                <div class="bg-purple-500/20 border border-purple-400/40 rounded flex items-center justify-center font-bold text-purple-300 text-lg">3</div>
+                <div class="bg-slate-700/50 rounded"></div>
+                <div class="bg-emerald-500/20 border border-emerald-400/40 rounded flex items-center justify-center font-bold text-emerald-300 text-lg">5</div>
+                <div class="bg-slate-700/50 rounded"></div>
+                <div class="bg-indigo-500/20 border border-indigo-400/40 rounded flex items-center justify-center font-bold text-indigo-300 text-lg">1</div>
+                <div class="bg-slate-700/50 rounded"></div>
+                <div class="bg-amber-500/20 border border-amber-400/40 rounded flex items-center justify-center font-bold text-amber-300 text-lg">7</div>
+            </div>
+        </div>
+
+        <!-- Title Screen Buttons -->
+        <div class="w-full max-w-xs space-y-3 mb-8">
+            <button id="start-game-btn" class="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-extrabold text-lg rounded-2xl shadow-xl transition transform hover:scale-105 active:scale-95 flex items-center justify-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>ゲームスタート</span>
+            </button>
+            
+            <button id="title-puzzle-list-btn" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl border border-slate-700 transition active:scale-95 flex items-center justify-center space-x-2 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                <span>問題リスト・実績 (10,000問)</span>
+            </button>
+        </div>
+
+        <div class="text-xs text-slate-500 font-mono">
+            TWINS SUDOKU v1.0
+        </div>
+    </div>
+
+    <!-- ==================== GAME HEADER ==================== -->
     <header class="flex items-center justify-between px-4 py-3 bg-white shadow-sm border-b border-slate-200">
         <div class="flex items-center space-x-3">
             <button id="pause-btn" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition active:scale-95" title="一時停止">
@@ -79,8 +128,8 @@
         
         <!-- Level & Game Info Bar with # Numbering -->
         <div class="w-full flex justify-between items-center px-2 mb-2 text-xs font-semibold text-slate-500">
-            <div id="level-display" class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full uppercase tracking-wider">Lv. 3 普通</div>
-            <div id="puzzle-id" class="font-mono text-slate-600 text-sm font-bold bg-slate-200 px-2 py-0.5 rounded">#2001</div>
+            <div id="level-display" class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full uppercase tracking-wider">Lv. 1 簡単</div>
+            <div id="puzzle-id" class="font-mono text-slate-600 text-sm font-bold bg-slate-200 px-2 py-0.5 rounded">#1001</div>
         </div>
 
         <!-- Sudoku Board Wrapper with distinct 3x3 block borders -->
@@ -90,9 +139,22 @@
             </div>
 
             <!-- Pause Overlay -->
-            <div id="pause-overlay" class="absolute inset-0 bg-white/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center hidden">
-                <div class="text-2xl font-bold text-slate-700 mb-4">ゲーム一時停止中</div>
-                <button id="resume-btn" class="px-6 py-2.5 bg-blue-500 text-white rounded-xl font-semibold shadow hover:bg-blue-600 transition active:scale-95">再開する</button>
+            <div id="pause-overlay" class="absolute inset-0 bg-slate-900/90 backdrop-blur-md z-20 flex flex-col items-center justify-center space-y-4 p-6 hidden">
+                <div class="text-2xl font-bold text-white mb-2 tracking-wide">PAUSE</div>
+                <div class="w-full max-w-xs space-y-3">
+                    <button id="resume-btn" class="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        </svg>
+                        <span>ゲームを続ける</span>
+                    </button>
+                    <button id="return-title-btn" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl border border-slate-700 transition active:scale-95 flex items-center justify-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span>タイトルに戻る</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Win Overlay -->
@@ -103,7 +165,6 @@
             </div>
         </div>
 
-        <!-- Toolbar / Action Buttons -->
         <div class="w-full max-w-[380px] flex items-center justify-between px-2 my-2">
             <button id="undo-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-600 hover:bg-slate-50 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed flex-1 mx-0.5" title="元に戻す">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,7 +187,7 @@
                 <span id="multi-select-label" class="text-[10px] font-medium">複数: OFF</span>
             </button>
 
-            <button id="hint-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-amber-50 shadow-sm border border-amber-200 text-amber-700 hover:bg-amber-100 transition active:scale-95 flex-1 mx-0.5 relative" title="行き詰った時のヒント">
+            <button id="hint-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-amber-50 shadow-sm border border-amber-200 text-amber-700 hover:bg-amber-100 transition active:scale-95 flex-1 mx-0.5 relative" title="ヒント（正解を1つ表示）">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
@@ -150,7 +211,6 @@
             </button>
         </div>
 
-        <!-- Keypad Layout (Horizontal 1 to 9 row) -->
         <div class="w-full max-w-[380px] grid grid-cols-9 gap-1 px-2 my-1">
             <button class="keypad-btn relative aspect-[3/4] bg-white hover:bg-blue-50 active:bg-blue-100 text-slate-800 rounded-lg font-bold text-lg flex flex-col items-center justify-center shadow-sm border border-slate-200 transition transform active:scale-95" data-num="1">
                 <span>1</span>
@@ -195,26 +255,26 @@
     <div id="difficulty-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl relative">
             <button id="close-diff-modal-btn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-xl hidden">&times;</button>
-            <h2 class="text-xl font-bold text-slate-800 mb-4 text-center">難易度を選択 (全10,000問)</h2>
+            <h2 class="text-xl font-bold text-slate-800 mb-4 text-center">難易度を選択 (総計10,000問)</h2>
             <div class="space-y-2.5">
                 <button class="difficulty-option w-full py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold rounded-xl border border-emerald-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="easy">
-                    <span>簡単 (Easy: #1001〜#3500)</span>
+                    <span>簡単 (#1001〜#3500)</span>
                     <span class="text-xs bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full">Lv. 1</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold rounded-xl border border-blue-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="normal">
-                    <span>普通 (Normal: #3501〜#6000)</span>
+                    <span>普通 (#3501〜#6000)</span>
                     <span class="text-xs bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full">Lv. 3</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold rounded-xl border border-amber-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="hard">
-                    <span>難しい (Hard: #6001〜#8500)</span>
+                    <span>難しい (#6001〜#8500)</span>
                     <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">Lv. 6</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-purple-50 hover:bg-purple-100 text-purple-800 font-semibold rounded-xl border border-purple-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="expert">
-                    <span>高難度 (Expert: #8501〜#11000)</span>
+                    <span>高難度 (#8501〜#11000)</span>
                     <span class="text-xs bg-purple-200 text-purple-900 px-2 py-0.5 rounded-full">Lv. 8</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-rose-50 hover:bg-rose-100 text-rose-800 font-semibold rounded-xl border border-rose-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="master">
-                    <span>激ムズ (Master: #11001〜#13500)</span>
+                    <span>激ムズ (#11001〜#13500)</span>
                     <span class="text-xs bg-rose-200 text-rose-900 px-2 py-0.5 rounded-full">Lv. 10</span>
                 </button>
             </div>
@@ -237,7 +297,7 @@
                 <button class="tab-btn py-1.5 text-[11px] font-bold rounded-lg text-slate-600" data-tab="master">激ムズ</button>
             </div>
 
-            <!-- Pagination bar (100 puzzles per page -> 25 pages per difficulty) -->
+            <!-- Pagination bar (100 puzzles per page) -->
             <div class="flex items-center justify-between bg-slate-50 px-3 py-1.5 rounded-lg mb-2 text-xs text-slate-600">
                 <button id="prev-page-btn" class="px-2.5 py-1 bg-white border border-slate-200 rounded font-semibold hover:bg-slate-100 active:scale-95 disabled:opacity-40">前へ</button>
                 <span id="page-info" class="font-mono font-bold">ページ 1 / 25 (#1001〜#1100)</span>
@@ -275,11 +335,11 @@
         let currentDifficulty = 'easy';
         let currentPuzzleId = '#1001';
         let activeTab = 'easy';
-        let currentPage = 1;
-        const ITEMS_PER_PAGE = 100; // 100 puzzles per page (25 pages total for 2500 puzzles)
-
-        // LocalStorage for cleared puzzles
-        let clearedPuzzles = JSON.parse(localStorage.getItem('sudoku_10k_cleared_puzzles') || '{}');
+        // DOM Elements
+        const titleScreen = document.getElementById('title-screen');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const titlePuzzleListBtn = document.getElementById('title-puzzle-list-btn');
+        const returnTitleBtn = document.getElementById('return-title-btn');
 
         const boardEl = document.getElementById('sudoku-board');
         const timerDisplay = document.getElementById('timer-display');
@@ -312,165 +372,27 @@
         const pageInfo = document.getElementById('page-info');
 
         // Pseudo-random generator using seed string
-        function mulberry32(a) {
-            return function() {
-              var t = a += 0x6D2B79F5;
-              t = Math.imul(t ^ t >>> 15, t | 1);
-              t ^= t + Math.imul(t ^ t >>> 8, t | 1);
-              return ((t ^ t >>> 14) >>> 0) / 4294967296;
-            }
-        }
+        // Title Screen Logic
+        startGameBtn.addEventListener('click', () => {
+            titleScreen.classList.add('hidden');
+            difficultyModal.classList.remove('hidden');
+            closeDiffModalBtn.classList.add('hidden');
+        });
 
-        function getSeedFromId(idStr) {
-            let num = parseInt(idStr.replace('#', ''), 10) || 1001;
-            return num * 15485863;
-        }
+        titlePuzzleListBtn.addEventListener('click', () => {
+            renderPuzzleList(activeTab, currentPage);
+            puzzleSelectModal.classList.remove('hidden');
+        });
 
-        function isValid(grid, row, col, num) {
-            for (let i = 0; i < 9; i++) {
-                if (grid[row * 9 + i] === num) return false;
-                if (grid[i * 9 + col] === num) return false;
-            }
-            let startRow = Math.floor(row / 3) * 3;
-            let startCol = Math.floor(col / 3) * 3;
-            for (let r = startRow; r < startRow + 3; r++) {
-                for (let c = startCol; c < startCol + 3; c++) {
-                    if (grid[r * 9 + c] === num) return false;
-                }
-            }
-            return true;
-        }
-
-        function generateSudoku(difficulty, targetPuzzleId = null) {
-            if (targetPuzzleId) {
-                currentPuzzleId = targetPuzzleId;
-                currentDifficulty = difficulty;
-            } else {
-                const diffRanges = { 
-                    easy: { start: 1001, count: 2500 }, 
-                    normal: { start: 3501, count: 2500 }, 
-                    hard: { start: 6001, count: 2500 }, 
-                    expert: { start: 8501, count: 2500 }, 
-                    master: { start: 11001, count: 2500 } 
-                };
-                const range = diffRanges[difficulty] || diffRanges.easy;
-                let attempts = 0;
-                let candidateId = '';
-                do {
-                    const randomNum = range.start + Math.floor(Math.random() * range.count);
-                    candidateId = '#' + randomNum;
-                    attempts++;
-                } while (clearedPuzzles[candidateId] && attempts < 150);
-                currentPuzzleId = candidateId;
-                currentDifficulty = difficulty;
-            }
-
-            const rng = mulberry32(getSeedFromId(currentPuzzleId));
-
-            function seededShuffle(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(rng() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-                return array;
-            }
-
-            function solveSudokuSeeded(grid) {
-                for (let i = 0; i < 81; i++) {
-                    if (grid[i] === 0) {
-                        const row = Math.floor(i / 9);
-                        const col = i % 9;
-                        const nums = seededShuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-                        for (let num of nums) {
-                            if (isValid(grid, row, col, num)) {
-                                grid[i] = num;
-                                if (solveSudokuSeeded(grid)) return true;
-                                grid[i] = 0;
-                            }
-                        }
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            let base = new Array(81).fill(0);
-            solveSudokuSeeded(base);
-            solution = [...base];
-
-            // Determine clue count based on difficulty
-            let removeCount = 40;
-            let levelText = "Lv. 3 普通";
-            if (currentDifficulty === 'easy') { removeCount = 34; levelText = "Lv. 1 簡単"; }
-            else if (currentDifficulty === 'normal') { removeCount = 42; levelText = "Lv. 3 普通"; }
-            else if (currentDifficulty === 'hard') { removeCount = 50; levelText = "Lv. 6 難しい"; }
-            else if (currentDifficulty === 'expert') { removeCount = 56; levelText = "Lv. 8 高難度"; }
-            else if (currentDifficulty === 'master') { removeCount = 60; levelText = "Lv. 10 激ムズ"; }
-
-            document.getElementById('level-display').textContent = levelText;
-            document.getElementById('puzzle-id').textContent = currentPuzzleId;
-
-            puzzle = [...solution];
-            let removed = 0;
-            let attempts = removeCount * 2;
-            while (removed < removeCount && attempts > 0) {
-                let idx = Math.floor(rng() * 81);
-                if (puzzle[idx] !== 0) {
-                    puzzle[idx] = 0;
-                    removed++;
-                }
-                attempts--;
-            }
-
-            board = [...puzzle];
-            initialClues = puzzle.map(val => val !== 0);
-            notes = Array.from({ length: 81 }, () => new Set());
-            history = [];
-            redoStack = [];
-            selectedCellsSet.clear();
-            selectedCell = null;
-            updateKeypadCounts();
-        }
-
-        function updateKeypadCounts() {
-            const counts = Array(10).fill(9);
-            for (let i = 0; i < 81; i++) {
-                let val = board[i];
-                if (val >= 1 && val <= 9) {
-                    counts[val]--;
-                }
-            }
-            document.querySelectorAll('.keypad-btn').forEach(btn => {
-                const num = parseInt(btn.dataset.num, 10);
-                const countSpan = btn.querySelector('.remaining-count');
-                const remaining = counts[num];
-                countSpan.textContent = remaining;
-                if (remaining === 0) {
-                    btn.classList.add('opacity-40', 'bg-slate-100');
-                } else {
-                    btn.classList.remove('opacity-40', 'bg-slate-100');
-                }
-            });
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            timerSeconds = 0;
-            timerDisplay.textContent = "00:00";
-            if (isPaused || isGameOver) return;
-            timerInterval = setInterval(() => {
-                if (!isPaused && !isGameOver) {
-                    timerSeconds++;
-                    const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-                    const secs = String(timerSeconds % 60).padStart(2, '0');
-                    timerDisplay.textContent = `${mins}:${secs}`;
-                }
-            }, 1000);
-        }
-
-        function stopTimer() {
-            clearInterval(timerInterval);
-        }
+        returnTitleBtn.addEventListener('click', () => {
+            isPaused = false;
+            stopTimer();
+            pauseOverlay.classList.add('hidden');
+            winOverlay.classList.add('hidden');
+            difficultyModal.classList.add('hidden');
+            puzzleSelectModal.classList.add('hidden');
+            titleScreen.classList.remove('hidden');
+        });
 
         pauseBtn.addEventListener('click', () => {
             if (isGameOver) return;
@@ -700,9 +622,212 @@
             }
         });
 
+        // ==================== SUDOKU GENERATOR & VALIDATOR ENGINE ====================
+        let clearedPuzzles = JSON.parse(localStorage.getItem('sudoku_10k_cleared_puzzles') || '{}');
+        const ITEMS_PER_PAGE = 100;
+        let currentPage = 1;
+
+        // Simple seedable random number generator (PRNG)
+        function mulberry32(a) {
+            return function() {
+                let t = a += 0x6D2B79F5;
+                t = Math.imul(t ^ (t >>> 15), t | 1);
+                t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            }
+        }
+
+        function stringToSeed(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = Math.imul(31, hash) + str.charCodeAt(i) | 0;
+            }
+            return hash;
+        }
+
+        // Check if a cell has duplicate number in row, col, or 3x3 block
+        function isCellConflicting(idx) {
+            const val = board[idx];
+            if (val === 0) return false;
+
+            const r = Math.floor(idx / 9);
+            const c = idx % 9;
+
+            // Check row & col
+            for (let i = 0; i < 9; i++) {
+                if (i !== c && board[r * 9 + i] === val) return true;
+                if (i !== r && board[i * 9 + c] === val) return true;
+            }
+
+            // Check 3x3 block
+            const boxR = Math.floor(r / 3) * 3;
+            const boxC = Math.floor(c / 3) * 3;
+            for (let br = boxR; br < boxR + 3; br++) {
+                for (let bc = boxC; bc < boxC + 3; bc++) {
+                    const checkIdx = br * 9 + bc;
+                    if (checkIdx !== idx && board[checkIdx] === val) return true;
+                }
+            }
+            return false;
+        }
+
+        // Generate full valid grid using backtracking with seeded RNG
+        function fillGrid(grid, rng) {
+            for (let i = 0; i < 81; i++) {
+                if (grid[i] === 0) {
+                    const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                    // Shuffle with RNG
+                    for (let j = nums.length - 1; j > 0; j--) {
+                        const k = Math.floor(rng() * (j + 1));
+                        [nums[j], nums[k]] = [nums[k], nums[j]];
+                    }
+
+                    for (const num of nums) {
+                        const r = Math.floor(i / 9);
+                        const c = i % 9;
+                        let valid = true;
+
+                        for (let k = 0; k < 9; k++) {
+                            if (grid[r * 9 + k] === num || grid[k * 9 + c] === num) {
+                                valid = false;
+                                break;
+                            }
+                        }
+
+                        if (valid) {
+                            const boxR = Math.floor(r / 3) * 3;
+                            const boxC = Math.floor(c / 3) * 3;
+                            for (let br = boxR; br < boxR + 3 && valid; br++) {
+                                for (let bc = boxC; bc < boxC + 3; bc++) {
+                                    if (grid[br * 9 + bc] === num) {
+                                        valid = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (valid) {
+                            grid[i] = num;
+                            if (fillGrid(grid, rng)) return true;
+                            grid[i] = 0;
+                        }
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function generateSudoku(diff = 'easy', targetPuzzleId = null) {
+            currentDifficulty = diff;
+            const diffLabels = {
+                easy: 'Lv. 1 簡単',
+                normal: 'Lv. 3 普通',
+                hard: 'Lv. 6 難しい',
+                expert: 'Lv. 8 高難度',
+                master: 'Lv. 10 激ムズ'
+            };
+            const clueCounts = {
+                easy: 42,
+                normal: 36,
+                hard: 30,
+                expert: 26,
+                master: 22
+            };
+
+            document.getElementById('level-display').textContent = diffLabels[diff];
+
+            if (targetPuzzleId) {
+                currentPuzzleId = targetPuzzleId;
+            } else {
+                const config = diffRangesConfig[diff];
+                const randomNum = config.start + Math.floor(Math.random() * config.total);
+                currentPuzzleId = '#' + randomNum;
+            }
+            document.getElementById('puzzle-id').textContent = currentPuzzleId;
+
+            const seed = stringToSeed(currentPuzzleId + '_' + diff);
+            const rng = mulberry32(seed);
+
+            solution = new Array(81).fill(0);
+            fillGrid(solution, rng);
+
+            puzzle = [...solution];
+            const indices = Array.from({ length: 81 }, (_, i) => i);
+            for (let i = indices.length - 1; i > 0; i--) {
+                const j = Math.floor(rng() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
+            }
+
+            const cluesToKeep = clueCounts[diff];
+            const toRemove = 81 - cluesToKeep;
+            for (let i = 0; i < toRemove; i++) {
+                puzzle[indices[i]] = 0;
+            }
+
+            board = [...puzzle];
+            initialClues = puzzle.map(val => val !== 0);
+            notes = Array.from({ length: 81 }, () => new Set());
+            history = [];
+            redoStack = [];
+            selectedCell = null;
+            selectedCellsSet.clear();
+
+            undoBtn.setAttribute('disabled', 'true');
+            redoBtn.setAttribute('disabled', 'true');
+
+            updateKeypadCounts();
+        }
+
+        function updateKeypadCounts() {
+            const counts = new Array(10).fill(9);
+            for (let i = 0; i < 81; i++) {
+                if (board[i] >= 1 && board[i] <= 9) {
+                    counts[board[i]]--;
+                }
+            }
+
+            document.querySelectorAll('.keypad-btn').forEach(btn => {
+                const num = parseInt(btn.dataset.num, 10);
+                const remainingSpan = btn.querySelector('.remaining-count');
+                if (remainingSpan) {
+                    const remaining = Math.max(0, counts[num]);
+                    remainingSpan.textContent = remaining;
+                    if (remaining === 0) {
+                        btn.classList.add('opacity-40');
+                    } else {
+                        btn.classList.remove('opacity-40');
+                    }
+                }
+            });
+        }
+
+        function startTimer() {
+            stopTimer();
+            timerSeconds = 0;
+            timerDisplay.textContent = "00:00";
+            timerInterval = setInterval(() => {
+                if (!isPaused && !isGameOver) {
+                    timerSeconds++;
+                    const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+                    const s = String(timerSeconds % 60).padStart(2, '0');
+                    timerDisplay.textContent = `${m}:${s}`;
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        // Win condition: Check if all cells are filled and valid according to Sudoku rules
         function checkWinCondition() {
             for (let i = 0; i < 81; i++) {
-                if (board[i] === 0 || board[i] !== solution[i]) return;
+                if (board[i] === 0 || isCellConflicting(i)) return;
             }
             isGameOver = true;
             stopTimer();
@@ -846,6 +971,7 @@
             btn.addEventListener('click', () => {
                 const diff = btn.dataset.level;
                 difficultyModal.classList.add('hidden');
+                titleScreen.classList.add('hidden');
                 isGameOver = false;
                 isPaused = false;
                 pauseOverlay.classList.add('hidden');
@@ -869,7 +995,7 @@
                 const isSelected = selectedCell === i;
                 const isMultiSelected = selectedCellsSet.has(i);
                 const isSameNum = selectedVal !== 0 && val === selectedVal;
-                const isError = val !== 0 && val !== solution[i];
+                const isError = !isInitial && val !== 0 && isCellConflicting(i);
 
                 let borderClasses = '';
                 if (c === 2 || c === 5) borderClasses += ' border-r-[4px] border-r-slate-900';
@@ -927,9 +1053,9 @@
         }
 
         window.onload = function() {
+            // Keep title screen visible on load
             generateSudoku('easy', '#1001');
             renderBoard();
-            startTimer();
         };
     </script>
 </body>
