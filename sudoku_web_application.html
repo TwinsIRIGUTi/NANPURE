@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sudoku Master</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sudoku: {
+                            bg: '#f3f4f6',
+                            board: '#ffffff',
+                            border: '#9ca3af',
+                            thickBorder: '#374151',
+                            cellSelected: '#bfdbfe',
+                            cellHighlight: '#eff6ff',
+                            cellSameNumber: '#dbeafe',
+                            cellError: '#fee2e2',
+                            keypadBg: '#e5e7eb',
+                            keypadBtn: '#ffffff',
+                            keypadActive: '#3b82f6',
+                            accent: '#3b82f6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        input, button {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 h-screen w-screen overflow-hidden flex flex-col justify-between select-none">
+
+    <!-- Top Navigation / Header -->
+    <header class="flex items-center justify-between px-4 py-3 bg-white shadow-sm border-b border-slate-200">
+        <div class="flex items-center space-x-3">
+            <button id="pause-btn" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition active:scale-95" title="一時停止">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
+            <div class="flex items-center space-x-1.5 font-mono text-lg font-semibold text-slate-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="timer-display">00:00</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <button id="new-game-btn" class="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-sm font-medium shadow hover:bg-blue-600 transition active:scale-95 flex items-center space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>新しいゲーム</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="flex-1 flex flex-col items-center justify-center p-2 max-w-lg mx-auto w-full overflow-hidden">
+        
+        <!-- Level & Game Info Bar -->
+        <div class="w-full flex justify-between items-center px-2 mb-2 text-xs font-semibold text-slate-500">
+            <div id="level-display" class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full uppercase tracking-wider">Lv. 3 Normal</div>
+            <div id="puzzle-id" class="font-mono text-slate-400">#0950</div>
+        </div>
+
+        <!-- Sudoku Board Wrapper -->
+        <div class="relative aspect-square w-full max-w-[400px] bg-slate-900 p-2 rounded-xl shadow-xl">
+            <!-- 盤面全体の背景を濃い色(bg-slate-700)にして格子線をはっきり見せる -->
+            <div id="sudoku-board" class="grid grid-cols-9 grid-rows-9 w-full h-full bg-slate-700 rounded-lg overflow-hidden gap-[1px]">
+                <!-- Cells generated dynamically -->
+            </div>
+
+            <!-- Pause Overlay -->
+            <div id="pause-overlay" class="absolute inset-0 bg-white/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center hidden">
+                <div class="text-2xl font-bold text-slate-700 mb-4">ゲーム一時停止中</div>
+                <button id="resume-btn" class="px-6 py-2.5 bg-blue-500 text-white rounded-xl font-semibold shadow hover:bg-blue-600 transition active:scale-95">再開する</button>
+            </div>
+
+            <!-- Win Overlay -->
+            <div id="win-overlay" class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center text-white hidden">
+                <div class="text-4xl font-extrabold mb-2 text-yellow-400">🎉 CLEAR! 🎉</div>
+                <p id="win-time" class="text-lg text-slate-200 mb-6 font-mono">タイム: 02:45</p>
+                <button id="play-again-btn" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold rounded-xl shadow-lg transition transform hover:scale-105 active:scale-95">もう一度プレイ</button>
+            </div>
+        </div>
+
+        <!-- Toolbar / Action Buttons -->
+        <div class="w-full max-w-[400px] flex items-center justify-between px-2 my-2">
+            <button id="undo-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-600 hover:bg-slate-50 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed flex-1 mx-1" title="元に戻す">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+                <span class="text-[10px] font-medium">元に戻す</span>
+            </button>
+
+            <button id="redo-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-600 hover:bg-slate-50 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed flex-1 mx-1" title="やり直す">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
+                </svg>
+                <span class="text-[10px] font-medium">やり直す</span>
+            </button>
+
+            <button id="erase-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-600 hover:bg-slate-50 transition active:scale-95 flex-1 mx-1" title="消去">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span class="text-[10px] font-medium">消去</span>
+            </button>
+
+            <button id="notes-mode-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-600 hover:bg-slate-50 transition active:scale-95 flex-1 mx-1 relative" title="不確定数字モード(メモ)">
+                <div id="notes-icon-preview" class="grid grid-cols-3 gap-0.5 w-5 h-5 mb-0.5 text-[8px] font-mono leading-none text-slate-400 bg-slate-100 p-0.5 rounded">
+                    <span>1</span><span>2</span><span>3</span>
+                    <span>4</span><span>5</span><span>6</span>
+                    <span>7</span><span>8</span><span>9</span>
+                </div>
+                <span id="notes-mode-label" class="text-[10px] font-medium">メモ: OFF</span>
+            </button>
+        </div>
+
+        <!-- Keypad & Mini Reference Layout (Inspired by Reference Images) -->
+        <div class="w-full max-w-[400px] grid grid-cols-3 gap-2 px-1 mb-2">
+            <!-- 9 Keypad Buttons (1-9) with Remaining Counts -->
+            <div class="col-span-2 grid grid-cols-3 gap-1.5 bg-amber-50/60 p-2 rounded-2xl border border-amber-200/60 shadow-inner">
+                <button class="keypad-btn relative aspect-square bg-white hover:bg-amber-100 active:bg-amber-200 text-amber-900 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm transition transform active:scale-95" data-num="1">
+                    <span>1</span>
+                    <span class="remaining-count absolute top-1 right-1.5 text-[10px] font-mono font-bold text-amber-700/70">9</span>
+                </button>
+                <button class="keypad-btn relative aspect-square bg-white hover:bg-amber-100 active:bg-amber-200 text-amber-900 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm transition transform active:scale-95" data-num="2">
+                    <span>2</span>
+                    <span class="remaining-count absolute top-1 right-1.5 text-[10px] font-mono font-bold text-amber-700/70">9</span>
+                </button>
+                <button class="keypad-btn relative aspect-square bg-white hover:bg-amber-100 active:bg-amber-200 text-amber-900 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm transition transform active:scale-95" data-num="3">
+                    <span>3</span>
+                    <span class="remaining-count absolute top-1 right-1.5 text-[10px] font-mono font-bold text-amber-700/70">9</span>
+                </button>
+                <button class="keypad-btn relative aspect-square bg-white hover:bg-amber-100 active:bg-amber-200 text-amber-900 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm transition transform active:scale-95" data-num="4">
+                    <span>4</span>
+                    <span class="remaining-count absolute top-1 right-1.5 text-[10px] font-mono font-bold text-amber-700/70">9</span>
+                </button>
+                <button class="keypad-btn relative aspect-square bg-white hover:bg-amber-100 active:bg-amber-200 text-amber-900 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm transition transform active:scale-95" data-num="5">
+                    <span>5</span>
+                    <span class="remaining-count absolute top-1 right-1.5 text-[10px] font-mono font-bold text-amber-700/70">9</span>
+                </button>
+                <button class="keypad-btn relative aspect-square bg-white hover:bg-amber-100 active:bg-amber-200 text-amber-900 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm transition transform active:scale-95" data-num="6">
+                    <span>6</span>
+                    <span class="remaining-count absolute top-1 right-1.5 text-[10px] font-mono font-bold text-amber-700/70">9</span>
+                </button>
+                <button class="keypad-btn relative aspect-square bg-white hover:bg-amber-100 active:bg-amber-200 text-amber-900 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm transition transform active:scale-95" data-num="7">
+                    <span>7</span>
+                    <span class="remaining-count absolute top-1 right-1.5 text-[10px] font-mono font-bold text-amber-700/70">9</span>
+                </button>
+                <button class="keypad-btn relative aspect-square bg-white hover:bg-amber-100 active:bg-amber-200 text-amber-900 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm transition transform active:scale-95" data-num="8">
+                    <span>8</span>
+                    <span class="remaining-count absolute top-1 right-1.5 text-[10px] font-mono font-bold text-amber-700/70">9</span>
+                </button>
+                <button class="keypad-btn relative aspect-square bg-white hover:bg-amber-100 active:bg-amber-200 text-amber-900 rounded-xl font-bold text-xl flex items-center justify-center shadow-sm transition transform active:scale-95" data-num="9">
+                    <span>9</span>
+                    <span class="remaining-count absolute top-1 right-1.5 text-[10px] font-mono font-bold text-amber-700/70">9</span>
+                </button>
+            </div>
+
+            <!-- Right Info Panel (Level + Puzzle ID + Mini Notes Grid Preview) -->
+            <div class="flex flex-col justify-between bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="text-center">
+                    <div id="panel-level" class="text-xs font-bold text-blue-600 bg-blue-50 py-1 rounded-lg mb-1">Lv. 3 Normal</div>
+                    <div id="panel-id" class="text-xs font-mono text-slate-400">#0950</div>
+                </div>
+                <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-100 flex items-center justify-center">
+                    <div class="grid grid-cols-3 gap-0.5 text-[8px] font-mono text-slate-500 text-center">
+                        <span>1</span><span>2</span><span>3</span>
+                        <span>4</span><span>5</span><span>6</span>
+                        <span>7</span><span>8</span><span>9</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Difficulty Selection Modal -->
+    <div id="difficulty-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <h2 class="text-xl font-bold text-slate-800 mb-4 text-center">難易度を選択</h2>
+            <div class="space-y-2.5">
+                <button class="difficulty-option w-full py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold rounded-xl border border-emerald-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="easy">
+                    <span>簡単 (Easy)</span>
+                    <span class="text-xs bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full">Lv. 1</span>
+                </button>
+                <button class="difficulty-option w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold rounded-xl border border-blue-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="normal">
+                    <span>普通 (Normal)</span>
+                    <span class="text-xs bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full">Lv. 3</span>
+                </button>
+                <button class="difficulty-option w-full py-3 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold rounded-xl border border-amber-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="hard">
+                    <span>難しい (Hard)</span>
+                    <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">Lv. 6</span>
+                </button>
+                <button class="difficulty-option w-full py-3 bg-rose-50 hover:bg-rose-100 text-rose-800 font-semibold rounded-xl border border-rose-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="expert">
+                    <span>激ムズ (Expert)</span>
+                    <span class="text-xs bg-rose-200 text-rose-900 px-2 py-0.5 rounded-full">Lv. 10</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        let solution = [];
+        let puzzle = [];
+        let board = [];
+        let notes = [];
+        let initialClues = [];
+        let selectedCell = null;
+        let notesMode = false;
+        let history = [];
+        let redoStack = [];
+        let timerSeconds = 0;
+        let timerInterval = null;
+        let isPaused = false;
+        let isGameOver = false;
+        let currentDifficulty = 'normal';
+
+        const boardEl = document.getElementById('sudoku-board');
+        const timerDisplay = document.getElementById('timer-display');
+        const eraseBtn = document.getElementById('erase-btn');
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
+        const notesModeBtn = document.getElementById('notes-mode-btn');
+        const notesModeLabel = document.getElementById('notes-mode-label');
+        const notesIconPreview = document.getElementById('notes-icon-preview');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resumeBtn = document.getElementById('resume-btn');
+        const pauseOverlay = document.getElementById('pause-overlay');
+        const winOverlay = document.getElementById('win-overlay');
+        const winTime = document.getElementById('win-time');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const newGameBtn = document.getElementById('new-game-btn');
+        const difficultyModal = document.getElementById('difficulty-modal');
+
+        function selectCell(index) {
+            if (isPaused || isGameOver) return;
+            selectedCell = index;
+            updateVisualHighlights();
+        }
+
+        function isValid(grid, row, col, num) {
+            for (let i = 0; i < 9; i++) {
+                if (grid[row * 9 + i] === num && i !== col) return false;
+                if (grid[i * 9 + col] === num && i !== row) return false;
+            }
+            const startRow = Math.floor(row / 3) * 3;
+            const startCol = Math.floor(col / 3) * 3;
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const currRow = startRow + r;
+                    const currCol = startCol + c;
+                    if (grid[currRow * 9 + currCol] === num && (currRow !== row || currCol !== col)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function solveSudoku(grid) {
+            for (let i = 0; i < 81; i++) {
+                if (grid[i] === 0) {
+                    const row = Math.floor(i / 9);
+                    const col = i % 9;
+                    const nums = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+                    for (let num of nums) {
+                        if (isValid(grid, row, col, num)) {
+                            grid[i] = num;
+                            if (solveSudoku(grid)) return true;
+                            grid[i] = 0;
+                        }
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function generateSudoku(difficulty) {
+            let base = new Array(81).fill(0);
+            solveSudoku(base);
+            solution = [...base];
+
+            let removeCount = 40;
+            let levelText = "Lv. 3 Normal";
+            if (difficulty === 'easy') { removeCount = 32; levelText = "Lv. 1 Easy"; }
+            else if (difficulty === 'normal') { removeCount = 40; levelText = "Lv. 3 Normal"; }
+            else if (difficulty === 'hard') { removeCount = 48; levelText = "Lv. 6 Hard"; }
+            else if (difficulty === 'expert') { removeCount = 55; levelText = "Lv. 10 Expert"; }
+
+            document.getElementById('level-display').textContent = levelText;
+            document.getElementById('panel-level').textContent = levelText;
+            const pId = '#' + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('puzzle-id').textContent = pId;
+            document.getElementById('panel-id').textContent = pId;
+
+            puzzle = [...solution];
+            let removed = 0;
+            let attempts = removeCount * 2;
+            while (removed < removeCount && attempts > 0) {
+                let idx = Math.floor(Math.random() * 81);
+                if (puzzle[idx] !== 0) {
+                    puzzle[idx] = 0;
+                    removed++;
+                }
+                attempts--;
+            }
+
+            board = [...puzzle];
+            initialClues = puzzle.map(val => val !== 0);
+            notes = Array.from({ length: 81 }, () => new Set());
+            history = [];
+            redoStack = [];
+        }
+
+        function renderBoard() {
+            boardEl.innerHTML = '';
+            for (let i = 0; i < 81; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'relative flex flex-col items-center justify-center bg-white cursor-pointer select-none text-xl font-semibold transition-colors duration-100';
+                cell.dataset.index = i;
+
+                const row = Math.floor(i / 9);
+                const col = i % 9;
+                
+                // 3x3ブロックの境界線を黒色の太線（4px）に設定
+                let borderStyle = '';
+                if (col === 2 || col === 5) {
+                    borderStyle += 'border-right: 4px solid #0f172a; ';
+                }
+                if (row === 2 || row === 5) {
+                    borderStyle += 'border-bottom: 4px solid #0f172a; ';
+                }
+                cell.style.cssText = borderStyle;
+
+                const val = board[i];
+                if (val !== 0) {
+                    const span = document.createElement('span');
+                    span.textContent = val;
+                    if (initialClues[i]) {
+                        span.className = 'text-slate-900 font-bold';
+                    } else {
+                        span.className = 'text-blue-600 font-bold';
+                    }
+                    cell.appendChild(span);
+                } else if (notes[i].size > 0) {
+                    const notesGrid = document.createElement('div');
+                    notesGrid.className = 'grid grid-cols-3 grid-rows-3 w-full h-full p-0.5 text-[9px] font-mono text-slate-400';
+                    for (let n = 1; n <= 9; n++) {
+                        const noteCell = document.createElement('span');
+                        noteCell.className = 'flex items-center justify-center';
+                        if (notes[i].has(n)) {
+                            noteCell.textContent = n;
+                            noteCell.className += ' text-slate-600 font-semibold';
+                        }
+                        notesGrid.appendChild(noteCell);
+                    }
+                    cell.appendChild(notesGrid);
+                }
+
+                cell.addEventListener('click', () => selectCell(i));
+                cell.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    selectCell(i);
+                }, { passive: false });
+
+                boardEl.appendChild(cell);
+            }
+            updateVisualHighlights();
+            updateRemainingCounts();
+            updateUndoRedoUI();
+        }
+
+        function updateVisualHighlights() {
+            const cells = boardEl.children;
+            const selectedVal = selectedCell !== null ? board[selectedCell] : null;
+
+            for (let i = 0; i < 81; i++) {
+                const cell = cells[i];
+                let baseBg = 'bg-white';
+
+                const row = Math.floor(i / 9);
+                const col = i % 9;
+                const selRow = selectedCell !== null ? Math.floor(selectedCell / 9) : -1;
+                const selCol = selectedCell !== null ? selectedCell % 9 : -1;
+
+                if (i === selectedCell) {
+                    baseBg = 'bg-blue-200';
+                } else if (selectedCell !== null && (
+                    row === selRow || 
+                    col === selCol || 
+                    (Math.floor(row / 3) === Math.floor(selRow / 3) && Math.floor(col / 3) === Math.floor(selCol / 3))
+                )) {
+                    baseBg = 'bg-blue-50';
+                }
+
+                if (selectedVal !== 0 && board[i] === selectedVal) {
+                    baseBg = 'bg-blue-100 font-bold';
+                }
+
+                if (board[i] !== 0 && !initialClues[i] && !isCellValid(i, board[i])) {
+                    baseBg = 'bg-rose-100 text-rose-600';
+                }
+
+                // 3x3ブロックの黒色太線（4px）を維持
+                let borderStyle = '';
+                if (col === 2 || col === 5) borderStyle += 'border-right: 4px solid #0f172a; ';
+                if (row === 2 || row === 5) borderStyle += 'border-bottom: 4px solid #0f172a; ';
+                cell.style.cssText = borderStyle;
+
+                cell.className = `relative flex flex-col items-center justify-center cursor-pointer select-none text-xl font-semibold transition-colors duration-100 ${baseBg}`;
+            }
+        }
+
+        function isCellValid(index, num) {
+            const row = Math.floor(index / 9);
+            const col = index % 9;
+            for (let i = 0; i < 9; i++) {
+                if (i !== col && board[row * 9 + i] === num) return false;
+                if (i !== row && board[i * 9 + col] === num) return false;
+            }
+            const startRow = Math.floor(row / 3) * 3;
+            const startCol = Math.floor(col / 3) * 3;
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const idx = (startRow + r) * 9 + (startCol + c);
+                    if (idx !== index && board[idx] === num) return false;
+                }
+            }
+            return true;
+        }
+
+        function updateRemainingCounts() {
+            const counts = new Array(10).fill(9);
+            for (let i = 0; i < 81; i++) {
+                const val = board[i];
+                if (val >= 1 && val <= 9) {
+                    counts[val]--;
+                }
+            }
+
+            document.querySelectorAll('.keypad-btn').forEach(btn => {
+                const num = parseInt(btn.dataset.num);
+                const countSpan = btn.querySelector('.remaining-count');
+                const remaining = counts[num];
+                countSpan.textContent = remaining;
+
+                if (remaining <= 0) {
+                    btn.classList.add('opacity-40', 'bg-slate-200');
+                } else {
+                    btn.classList.remove('opacity-40', 'bg-slate-200');
+                }
+            });
+        }
+
+        function handleNumberInput(num) {
+            if (selectedCell === null || isPaused || isGameOver) return;
+            if (initialClues[selectedCell]) return;
+
+            const oldVal = board[selectedCell];
+
+            if (oldVal === num && !notesMode) return;
+
+            saveStateForUndo();
+
+            if (notesMode) {
+                if (board[selectedCell] !== 0) return;
+                if (notes[selectedCell].has(num)) {
+                    notes[selectedCell].delete(num);
+                } else {
+                    notes[selectedCell].add(num);
+                }
+            } else {
+                board[selectedCell] = num;
+                notes[selectedCell].clear();
+                checkWinCondition();
+            }
+
+            renderBoard();
+        }
+
+        function handleErase() {
+            if (selectedCell === null || isPaused || isGameOver) return;
+            if (initialClues[selectedCell]) return;
+            if (board[selectedCell] === 0 && notes[selectedCell].size === 0) return;
+
+            saveStateForUndo();
+            board[selectedCell] = 0;
+            notes[selectedCell].clear();
+            renderBoard();
+        }
+
+        function saveStateForUndo() {
+            const state = {
+                board: [...board],
+                notes: notes.map(set => new Set(set)),
+                selectedCell
+            };
+            history.push(state);
+            redoStack = [];
+            updateUndoRedoUI();
+        }
+
+        function updateUndoRedoUI() {
+            undoBtn.disabled = history.length === 0;
+            redoBtn.disabled = redoStack.length === 0;
+        }
+
+        function undo() {
+            if (history.length === 0 || isPaused || isGameOver) return;
+            const currentState = {
+                board: [...board],
+                notes: notes.map(set => new Set(set)),
+                selectedCell
+            };
+            redoStack.push(currentState);
+            const prevState = history.pop();
+            board = prevState.board;
+            notes = prevState.notes;
+            selectedCell = prevState.selectedCell;
+            renderBoard();
+        }
+
+        function redo() {
+            if (redoStack.length === 0 || isPaused || isGameOver) return;
+            const currentState = {
+                board: [...board],
+                notes: notes.map(set => new Set(set)),
+                selectedCell
+            };
+            history.push(currentState);
+            const nextState = redoStack.pop();
+            board = nextState.board;
+            notes = nextState.notes;
+            selectedCell = nextState.selectedCell;
+            renderBoard();
+        }
+
+        function checkWinCondition() {
+            for (let i = 0; i < 81; i++) {
+                if (board[i] === 0 || board[i] !== solution[i]) return;
+            }
+            isGameOver = true;
+            stopTimer();
+            winTime.textContent = `タイム: ${timerDisplay.textContent}`;
+            winOverlay.classList.remove('hidden');
+        }
+
+        function startTimer() {
+            stopTimer();
+            timerSeconds = 0;
+            timerInterval = setInterval(() => {
+                if (!isPaused && !isGameOver) {
+                    timerSeconds++;
+                    const mins = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+                    const secs = (timerSeconds % 60).toString().padStart(2, '0');
+                    timerDisplay.textContent = `${mins}:${secs}`;
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+        }
+
+        document.querySelectorAll('.keypad-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                handleNumberInput(parseInt(btn.dataset.num));
+            });
+        });
+
+        eraseBtn.addEventListener('click', handleErase);
+        undoBtn.addEventListener('click', undo);
+        redoBtn.addEventListener('click', redo);
+
+        notesModeBtn.addEventListener('click', () => {
+            notesMode = !notesMode;
+            if (notesMode) {
+                notesModeBtn.classList.add('bg-blue-50', 'border-blue-500', 'text-blue-600');
+                notesModeLabel.textContent = 'メモ: ON';
+                notesModeLabel.className = 'text-[10px] font-bold text-blue-600';
+                notesIconPreview.className = 'grid grid-cols-3 gap-0.5 w-5 h-5 mb-0.5 text-[8px] font-mono leading-none text-white bg-blue-500 p-0.5 rounded';
+            } else {
+                notesModeBtn.classList.remove('bg-blue-50', 'border-blue-500', 'text-blue-600');
+                notesModeLabel.textContent = 'メモ: OFF';
+                notesModeLabel.className = 'text-[10px] font-medium text-slate-600';
+                notesIconPreview.className = 'grid grid-cols-3 gap-0.5 w-5 h-5 mb-0.5 text-[8px] font-mono leading-none text-slate-400 bg-slate-100 p-0.5 rounded';
+            }
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (isPaused || isGameOver) return;
+            if (e.key >= '1' && e.key <= '9') {
+                handleNumberInput(parseInt(e.key));
+            } else if (e.key === 'Backspace' || e.key === 'Delete') {
+                handleErase();
+            } else if (e.key.toLowerCase() === 'n') {
+                notesModeBtn.click();
+            } else if (selectedCell !== null) {
+                let row = Math.floor(selectedCell / 9);
+                let col = selectedCell % 9;
+                if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') row = (row - 1 + 9) % 9;
+                else if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') row = (row + 1) % 9;
+                else if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') col = (col - 1 + 9) % 9;
+                else if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') col = (col + 1) % 9;
+                else return;
+                selectCell(row * 9 + col);
+                e.preventDefault();
+            }
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            if (isGameOver) return;
+            isPaused = true;
+            pauseOverlay.classList.remove('hidden');
+        });
+
+        resumeBtn.addEventListener('click', () => {
+            isPaused = false;
+            pauseOverlay.classList.add('hidden');
+        });
+
+        newGameBtn.addEventListener('click', () => difficultyModal.classList.remove('hidden'));
+        playAgainBtn.addEventListener('click', () => {
+            winOverlay.classList.add('hidden');
+            difficultyModal.classList.remove('hidden');
+        });
+
+        document.querySelectorAll('.difficulty-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentDifficulty = btn.dataset.level;
+                difficultyModal.classList.add('hidden');
+                isGameOver = false;
+                isPaused = false;
+                pauseOverlay.classList.add('hidden');
+                winOverlay.classList.add('hidden');
+                generateSudoku(currentDifficulty);
+                renderBoard();
+                startTimer();
+            });
+        });
+
+        window.onload = function() {
+            generateSudoku('normal');
+            renderBoard();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
