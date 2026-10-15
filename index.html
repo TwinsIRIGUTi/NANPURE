@@ -311,7 +311,10 @@
 
             <div class="mt-3 pt-2 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
                 <span id="cleared-stats-summary">総クリア済み: 0 / 10,000 問</span>
-                <button id="reset-history-btn" class="text-rose-500 hover:underline">クリア記録リセット</button>
+                <div class="flex items-center space-x-2">
+                    <button id="regenerate-batch-btn" class="text-blue-600 hover:underline font-semibold hidden">新しい10kセットを生成</button>
+                    <button id="reset-history-btn" class="text-rose-500 hover:underline">クリア記録リセット</button>
+                </div>
             </div>
         </div>
     </div>
@@ -335,6 +338,7 @@
         let currentDifficulty = 'easy';
         let currentPuzzleId = '#1001';
         let activeTab = 'easy';
+        let hintUsedThisStage = false; // ヒント使用制限フラグ
         // DOM Elements
         const titleScreen = document.getElementById('title-screen');
         const startGameBtn = document.getElementById('start-game-btn');
@@ -524,6 +528,11 @@
 
         hintBtn.addEventListener('click', () => {
             if (isGameOver || isPaused) return;
+            if (hintUsedThisStage) {
+                alert('ヒントは各ステージ1回のみ使用可能です。');
+                return;
+            }
+
             let targetIdx = -1;
             if (selectedCell !== null && !initialClues[selectedCell] && board[selectedCell] !== solution[selectedCell]) {
                 targetIdx = selectedCell;
@@ -537,6 +546,9 @@
             }
 
             if (targetIdx === -1) return;
+
+            hintUsedThisStage = true;
+            hintBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
             history.push({
                 board: [...board],
@@ -624,6 +636,7 @@
 
         // ==================== SUDOKU GENERATOR & VALIDATOR ENGINE ====================
         let clearedPuzzles = JSON.parse(localStorage.getItem('sudoku_10k_cleared_puzzles') || '{}');
+        let batchOffset = parseInt(localStorage.getItem('sudoku_10k_batch_offset') || '0', 10);
         const ITEMS_PER_PAGE = 100;
         let currentPage = 1;
 
@@ -721,6 +734,8 @@
 
         function generateSudoku(diff = 'easy', targetPuzzleId = null) {
             currentDifficulty = diff;
+            hintUsedThisStage = false;
+            hintBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             const diffLabels = {
                 easy: 'Lv. 1 簡単',
                 normal: 'Lv. 3 普通',
@@ -742,7 +757,7 @@
                 currentPuzzleId = targetPuzzleId;
             } else {
                 const config = diffRangesConfig[diff];
-                const randomNum = config.start + Math.floor(Math.random() * config.total);
+                const randomNum = config.start + batchOffset + Math.floor(Math.random() * config.total);
                 currentPuzzleId = '#' + randomNum;
             }
             document.getElementById('puzzle-id').textContent = currentPuzzleId;
@@ -757,7 +772,7 @@
             const indices = Array.from({ length: 81 }, (_, i) => i);
             for (let i = indices.length - 1; i > 0; i--) {
                 const j = Math.floor(rng() * (i + 1));
-                [indices[i], indices[j]] = [indices[j], indices[i]];
+                [indices[i], indices[j]] = [indices[j], indices[j]];
             }
 
             const cluesToKeep = clueCounts[diff];
@@ -824,7 +839,7 @@
             }
         }
 
-        // Win condition: Check if all cells are filled and valid according to Sudoku rules
+        // Win condition: Check if all cells are filled and valid according to Sudoku rules (any valid arrangement is accepted)
         function checkWinCondition() {
             for (let i = 0; i < 81; i++) {
                 if (board[i] === 0 || isCellConflicting(i)) return;
@@ -859,8 +874,8 @@
             if (page > maxPages) page = maxPages;
             currentPage = page;
 
-            const startIndex = config.start + (page - 1) * ITEMS_PER_PAGE;
-            const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, config.start + config.total);
+            const startIndex = config.start + batchOffset + (page - 1) * ITEMS_PER_PAGE;
+            const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, config.start + batchOffset + config.total);
 
             pageInfo.textContent = `ページ ${page} / ${maxPages} (#${startIndex}〜#${endIndex - 1})`;
             prevPageBtn.disabled = page === 1;
@@ -912,7 +927,26 @@
 
             const totalCleared = Object.keys(clearedPuzzles).length;
             clearedStatsSummary.textContent = `総クリア済み: ${totalCleared} / 10,000 問`;
+
+            const regenerateBatchBtn = document.getElementById('regenerate-batch-btn');
+            if (totalCleared >= 10000) {
+                regenerateBatchBtn.classList.remove('hidden');
+            } else {
+                regenerateBatchBtn.classList.add('hidden');
+            }
         }
+
+        const regenerateBatchBtn = document.getElementById('regenerate-batch-btn');
+        regenerateBatchBtn.addEventListener('click', () => {
+            if (confirm('すべての10,000問をクリアしました！新しく別のランダム問題セット（次の1万問）を生成しますか？')) {
+                batchOffset += 10000;
+                localStorage.setItem('sudoku_10k_batch_offset', batchOffset);
+                clearedPuzzles = {};
+                localStorage.removeItem('sudoku_10k_cleared_puzzles');
+                currentPage = 1;
+                renderPuzzleList(activeTab, currentPage);
+            }
+        });
 
         prevPageBtn.addEventListener('click', () => {
             if (currentPage > 1) {
