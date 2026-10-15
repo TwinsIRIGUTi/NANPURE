@@ -1087,7 +1087,14 @@
         }
 
         window.onload = function() {
-            // Keep title screen visible on load
+            // Ensure title screen is visible on launch and modals are hidden
+            titleScreen.classList.remove('hidden');
+            difficultyModal.classList.add('hidden');
+            puzzleSelectModal.classList.add('hidden');
+            pauseOverlay.classList.add('hidden');
+            winOverlay.classList.add('hidden');
+
+            // Pre-generate puzzle in background so it's ready when user starts
             generateSudoku('easy', '#1001');
             renderBoard();
         };
