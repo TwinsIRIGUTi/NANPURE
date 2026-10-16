@@ -187,7 +187,7 @@
                 <span id="multi-select-label" class="text-[10px] font-medium">複数: OFF</span>
             </button>
 
-            <button id="hint-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-amber-50 shadow-sm border border-amber-200 text-amber-700 hover:bg-amber-100 transition active:scale-95 flex-1 mx-0.5 relative" title="ヒント（正解を1つ表示）">
+            <button id="hint-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-amber-50 shadow-sm border border-amber-200 text-amber-700 hover:bg-amber-100 transition active:scale-95 flex-1 mx-0.5 relative" title="ヒント（正解を1つ表示・各ステージ1回）">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
@@ -252,6 +252,7 @@
 
     </main>
 
+    <!-- Difficulty Selection Modal -->
     <div id="difficulty-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl relative">
             <button id="close-diff-modal-btn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold text-xl hidden">&times;</button>
@@ -259,29 +260,30 @@
             <div class="space-y-2.5">
                 <button class="difficulty-option w-full py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold rounded-xl border border-emerald-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="easy">
                     <span>簡単 (#1001〜#3500)</span>
-                    <span class="text-xs bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full">Lv. 1</span>
+                    <span class="text-xs bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full">Lv. 1 (ヒント42)</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-800 font-semibold rounded-xl border border-blue-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="normal">
                     <span>普通 (#3501〜#6000)</span>
-                    <span class="text-xs bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full">Lv. 3</span>
+                    <span class="text-xs bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full">Lv. 3 (ヒント36)</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold rounded-xl border border-amber-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="hard">
                     <span>難しい (#6001〜#8500)</span>
-                    <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">Lv. 6</span>
+                    <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">Lv. 6 (ヒント30)</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-purple-50 hover:bg-purple-100 text-purple-800 font-semibold rounded-xl border border-purple-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="expert">
                     <span>高難度 (#8501〜#11000)</span>
-                    <span class="text-xs bg-purple-200 text-purple-900 px-2 py-0.5 rounded-full">Lv. 8</span>
+                    <span class="text-xs bg-purple-200 text-purple-900 px-2 py-0.5 rounded-full">Lv. 8 (ヒント25)</span>
                 </button>
                 <button class="difficulty-option w-full py-3 bg-rose-50 hover:bg-rose-100 text-rose-800 font-semibold rounded-xl border border-rose-200 transition active:scale-95 flex justify-between px-4 items-center" data-level="master">
                     <span>激ムズ (#11001〜#13500)</span>
-                    <span class="text-xs bg-rose-200 text-rose-900 px-2 py-0.5 rounded-full">Lv. 10</span>
+                    <span class="text-xs bg-rose-200 text-rose-900 px-2 py-0.5 rounded-full">Lv. 10 (ヒント21)</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="puzzle-select-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+    <!-- Puzzle List & History Modal -->
+    <div id="puzzle-select-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden">
         <div class="bg-white rounded-2xl p-5 w-full max-w-lg shadow-2xl flex flex-col max-h-[88vh]">
             <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200">
                 <h2 class="text-lg font-bold text-slate-800">10,000問 問題リスト & 実績</h2>
@@ -338,7 +340,8 @@
         let currentDifficulty = 'easy';
         let currentPuzzleId = '#1001';
         let activeTab = 'easy';
-        let hintUsedThisStage = false; // ヒント使用制限フラグ
+        let hintUsedThisStage = false; // ヒント使用制限フラグ（1ゲーム1回）
+
         // DOM Elements
         const titleScreen = document.getElementById('title-screen');
         const startGameBtn = document.getElementById('start-game-btn');
@@ -375,8 +378,6 @@
         const nextPageBtn = document.getElementById('next-page-btn');
         const pageInfo = document.getElementById('page-info');
 
-        // Pseudo-random generator using seed string
-        // Title Screen Logic
         startGameBtn.addEventListener('click', () => {
             titleScreen.classList.add('hidden');
             difficultyModal.classList.remove('hidden');
@@ -529,7 +530,6 @@
         hintBtn.addEventListener('click', () => {
             if (isGameOver || isPaused) return;
             if (hintUsedThisStage) {
-                alert('ヒントは各ステージ1回のみ使用可能です。');
                 return;
             }
 
@@ -539,6 +539,16 @@
             } else {
                 for (let i = 0; i < 81; i++) {
                     if (!initialClues[i] && board[i] !== solution[i]) {
+                        targetIdx = i;
+                        break;
+                    }
+                }
+            }
+
+            if (targetIdx === -1) {
+                // If all incorrect cells are fixed, pick any empty cell
+                for (let i = 0; i < 81; i++) {
+                    if (!initialClues[i] && board[i] === 0) {
                         targetIdx = i;
                         break;
                     }
@@ -634,13 +644,11 @@
             }
         });
 
-        // ==================== SUDOKU GENERATOR & VALIDATOR ENGINE ====================
         let clearedPuzzles = JSON.parse(localStorage.getItem('sudoku_10k_cleared_puzzles') || '{}');
         let batchOffset = parseInt(localStorage.getItem('sudoku_10k_batch_offset') || '0', 10);
         const ITEMS_PER_PAGE = 100;
         let currentPage = 1;
 
-        // Simple seedable random number generator (PRNG)
         function mulberry32(a) {
             return function() {
                 let t = a += 0x6D2B79F5;
@@ -658,7 +666,7 @@
             return hash;
         }
 
-        // Check if a cell has duplicate number in row, col, or 3x3 block
+        // Check if a cell conflicts with Sudoku rules (same row, col, or 3x3 block)
         function isCellConflicting(idx) {
             const val = board[idx];
             if (val === 0) return false;
@@ -684,12 +692,10 @@
             return false;
         }
 
-        // Generate full valid grid using backtracking with seeded RNG
         function fillGrid(grid, rng) {
             for (let i = 0; i < 81; i++) {
                 if (grid[i] === 0) {
                     const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-                    // Shuffle with RNG
                     for (let j = nums.length - 1; j > 0; j--) {
                         const k = Math.floor(rng() * (j + 1));
                         [nums[j], nums[k]] = [nums[k], nums[j]];
@@ -736,6 +742,7 @@
             currentDifficulty = diff;
             hintUsedThisStage = false;
             hintBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
             const diffLabels = {
                 easy: 'Lv. 1 簡単',
                 normal: 'Lv. 3 普通',
@@ -743,12 +750,14 @@
                 expert: 'Lv. 8 高難度',
                 master: 'Lv. 10 激ムズ'
             };
+            
+            // Exact calibrated initial clue counts based on Master reference (21 clues)
             const clueCounts = {
                 easy: 42,
                 normal: 36,
                 hard: 30,
-                expert: 26,
-                master: 22
+                expert: 25,
+                master: 21
             };
 
             document.getElementById('level-display').textContent = diffLabels[diff];
@@ -772,7 +781,7 @@
             const indices = Array.from({ length: 81 }, (_, i) => i);
             for (let i = indices.length - 1; i > 0; i--) {
                 const j = Math.floor(rng() * (i + 1));
-                [indices[i], indices[j]] = [indices[j], indices[j]];
+                [indices[i], indices[j]] = [indices[j], indices[i]];
             }
 
             const cluesToKeep = clueCounts[diff];
@@ -839,7 +848,7 @@
             }
         }
 
-        // Win condition: Check if all cells are filled and valid according to Sudoku rules (any valid arrangement is accepted)
+        // Win condition: Rule-based validation (accepts any valid Sudoku arrangement, not just the solution)
         function checkWinCondition() {
             for (let i = 0; i < 81; i++) {
                 if (board[i] === 0 || isCellConflicting(i)) return;
@@ -912,6 +921,7 @@
                 if (!isCleared) {
                     card.addEventListener('click', () => {
                         puzzleSelectModal.classList.add('hidden');
+                        titleScreen.classList.add('hidden');
                         isGameOver = false;
                         isPaused = false;
                         pauseOverlay.classList.add('hidden');
