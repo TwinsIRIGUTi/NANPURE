@@ -56,7 +56,7 @@
             </p>
 
             <!-- Decorative Sudoku Grid Icon -->
-            <div class="w-24 h-24 sm:w-32 sm:32 my-6 grid grid-cols-3 gap-1 p-2 bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl">
+            <div class="w-24 h-24 sm:w-32 sm:w-32 my-6 grid grid-cols-3 gap-1 p-2 bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl">
                 <div class="bg-blue-500/20 border border-blue-400/40 rounded flex items-center justify-center font-bold text-blue-300 text-lg">9</div>
                 <div class="bg-slate-700/50 rounded"></div>
                 <div class="bg-purple-500/20 border border-purple-400/40 rounded flex items-center justify-center font-bold text-purple-300 text-lg">3</div>
@@ -126,13 +126,13 @@
 
     <main class="flex-1 flex flex-col items-center justify-center p-2 max-w-lg mx-auto w-full overflow-hidden">
         
-        <!-- Level & Game Info Bar with # Numbering -->
+        <!-- Level & Game Info Bar -->
         <div class="w-full flex justify-between items-center px-2 mb-2 text-xs font-semibold text-slate-500">
             <div id="level-display" class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full uppercase tracking-wider">Lv. 1 簡単</div>
             <div id="puzzle-id" class="font-mono text-slate-600 text-sm font-bold bg-slate-200 px-2 py-0.5 rounded">#1001</div>
         </div>
 
-        <!-- Sudoku Board Wrapper with distinct 3x3 block borders -->
+        <!-- Sudoku Board Wrapper -->
         <div class="relative aspect-square w-full max-w-[380px] bg-slate-900 p-2 rounded-xl shadow-xl">
             <div id="sudoku-board" class="grid grid-cols-9 grid-rows-9 w-full h-full bg-slate-700 rounded-lg overflow-hidden gap-[1px]">
                 <!-- Cells generated dynamically -->
@@ -165,6 +165,7 @@
             </div>
         </div>
 
+        <!-- Action Control Buttons -->
         <div class="w-full max-w-[380px] flex items-center justify-between px-2 my-2">
             <button id="undo-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-600 hover:bg-slate-50 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed flex-1 mx-0.5" title="元に戻す">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -180,9 +181,18 @@
                 <span class="text-[10px] font-medium">やり直す</span>
             </button>
 
-            <button id="multi-select-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-600 hover:bg-slate-50 transition active:scale-95 flex-1 mx-0.5 relative" title="複数選択モード">
+            <button id="notes-mode-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-600 hover:bg-slate-50 transition active:scale-95 flex-1 mx-0.5 relative" title="不確定数字モード(メモ)">
+                <div id="notes-icon-preview" class="grid grid-cols-3 gap-0.5 w-5 h-5 mb-0.5 text-[8px] font-mono leading-none text-slate-400 bg-slate-100 p-0.5 rounded">
+                    <span>1</span><span>2</span><span>3</span>
+                    <span>4</span><span>5</span><span>6</span>
+                    <span>7</span><span>8</span><span>9</span>
+                </div>
+                <span id="notes-mode-label" class="text-[10px] font-medium">メモ: OFF</span>
+            </button>
+
+            <button id="multi-select-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-400 opacity-50 cursor-not-allowed transition active:scale-95 flex-1 mx-0.5 relative" disabled title="複数選択モード（メモモード時のみ有効）">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2m-6 9l2 2 4-4" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 022 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2m-6 9l2 2 4-4" />
                 </svg>
                 <span id="multi-select-label" class="text-[10px] font-medium">複数: OFF</span>
             </button>
@@ -200,17 +210,9 @@
                 </svg>
                 <span class="text-[10px] font-medium">消去</span>
             </button>
-
-            <button id="notes-mode-btn" class="flex flex-col items-center justify-center p-2 rounded-xl bg-white shadow-sm border border-slate-200 text-slate-600 hover:bg-slate-50 transition active:scale-95 flex-1 mx-0.5 relative" title="不確定数字モード(メモ)">
-                <div id="notes-icon-preview" class="grid grid-cols-3 gap-0.5 w-5 h-5 mb-0.5 text-[8px] font-mono leading-none text-slate-400 bg-slate-100 p-0.5 rounded">
-                    <span>1</span><span>2</span><span>3</span>
-                    <span>4</span><span>5</span><span>6</span>
-                    <span>7</span><span>8</span><span>9</span>
-                </div>
-                <span id="notes-mode-label" class="text-[10px] font-medium">メモ: OFF</span>
-            </button>
         </div>
 
+        <!-- Keypad (1 to 9) -->
         <div class="w-full max-w-[380px] grid grid-cols-9 gap-1 px-2 my-1">
             <button class="keypad-btn relative aspect-[3/4] bg-white hover:bg-blue-50 active:bg-blue-100 text-slate-800 rounded-lg font-bold text-lg flex flex-col items-center justify-center shadow-sm border border-slate-200 transition transform active:scale-95" data-num="1">
                 <span>1</span>
@@ -290,7 +292,7 @@
                 <button id="close-puzzle-modal" class="text-slate-400 hover:text-slate-600 font-bold text-xl p-1">&times;</button>
             </div>
             
-            <!-- Category Tabs (5 levels, each 2500 puzzles) -->
+            <!-- Category Tabs -->
             <div class="grid grid-cols-5 gap-1 mb-2 bg-slate-100 p-1 rounded-xl">
                 <button class="tab-btn py-1.5 text-[11px] font-bold rounded-lg text-slate-600 bg-white shadow-sm" data-tab="easy">簡単</button>
                 <button class="tab-btn py-1.5 text-[11px] font-bold rounded-lg text-slate-600" data-tab="normal">普通</button>
@@ -299,7 +301,7 @@
                 <button class="tab-btn py-1.5 text-[11px] font-bold rounded-lg text-slate-600" data-tab="master">激ムズ</button>
             </div>
 
-            <!-- Pagination bar (100 puzzles per page) -->
+            <!-- Pagination bar -->
             <div class="flex items-center justify-between bg-slate-50 px-3 py-1.5 rounded-lg mb-2 text-xs text-slate-600">
                 <button id="prev-page-btn" class="px-2.5 py-1 bg-white border border-slate-200 rounded font-semibold hover:bg-slate-100 active:scale-95 disabled:opacity-40">前へ</button>
                 <span id="page-info" class="font-mono font-bold">ページ 1 / 25 (#1001〜#1100)</span>
@@ -340,7 +342,7 @@
         let currentDifficulty = 'easy';
         let currentPuzzleId = '#1001';
         let activeTab = 'easy';
-        let hintUsedThisStage = false; // ヒント使用制限フラグ（1ゲーム1回）
+        let hintUsedThisStage = false;
 
         // DOM Elements
         const titleScreen = document.getElementById('title-screen');
@@ -417,8 +419,10 @@
         });
 
         multiSelectBtn.addEventListener('click', () => {
+            if (!notesMode) return;
             multiSelectMode = !multiSelectMode;
             if (multiSelectMode) {
+                multiSelectBtn.classList.remove('bg-white', 'text-slate-600');
                 multiSelectBtn.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-600');
                 multiSelectLabel.textContent = '複数: ON';
                 if (selectedCell !== null) {
@@ -426,6 +430,7 @@
                 }
             } else {
                 multiSelectBtn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-600');
+                multiSelectBtn.classList.add('bg-white', 'text-slate-600');
                 multiSelectLabel.textContent = '複数: OFF';
                 selectedCellsSet.clear();
                 if (selectedCell !== null) selectedCellsSet.add(selectedCell);
@@ -440,16 +445,30 @@
                 notesModeLabel.textContent = 'メモ: ON';
                 notesIconPreview.classList.remove('bg-slate-100', 'text-slate-400');
                 notesIconPreview.classList.add('bg-blue-100', 'text-blue-600');
+
+                multiSelectBtn.removeAttribute('disabled');
+                multiSelectBtn.classList.remove('bg-slate-100', 'text-slate-400', 'opacity-50', 'cursor-not-allowed');
+                multiSelectBtn.classList.add('bg-white', 'text-slate-600', 'hover:bg-slate-50');
             } else {
                 notesModeBtn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-600');
                 notesModeLabel.textContent = 'メモ: OFF';
                 notesIconPreview.classList.remove('bg-blue-100', 'text-blue-600');
                 notesIconPreview.classList.add('bg-slate-100', 'text-slate-400');
+
+                multiSelectMode = false;
+                multiSelectBtn.setAttribute('disabled', 'true');
+                multiSelectBtn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-600', 'hover:bg-slate-50');
+                multiSelectBtn.classList.add('bg-slate-100', 'text-slate-400', 'opacity-50', 'cursor-not-allowed');
+                multiSelectLabel.textContent = '複数: OFF';
+
+                selectedCellsSet.clear();
+                if (selectedCell !== null) selectedCellsSet.add(selectedCell);
             }
+            renderBoard();
         });
 
         function selectCell(idx) {
-            if (multiSelectMode) {
+            if (multiSelectMode && notesMode) {
                 if (selectedCellsSet.has(idx)) {
                     selectedCellsSet.delete(idx);
                 } else {
@@ -465,9 +484,16 @@
         }
 
         function handleInput(num) {
-            if (isGameOver || isPaused || selectedCellsSet.size === 0) return;
+            if (isGameOver || isPaused || selectedCell === null) return;
 
-            const cellsArray = Array.from(selectedCellsSet).filter(idx => !initialClues[idx]);
+            let targetIndices = [];
+            if (multiSelectMode && notesMode && selectedCellsSet.size > 0) {
+                targetIndices = Array.from(selectedCellsSet);
+            } else {
+                targetIndices = [selectedCell];
+            }
+
+            const cellsArray = targetIndices.filter(idx => !initialClues[idx]);
             if (cellsArray.length === 0) return;
 
             history.push({
@@ -506,8 +532,16 @@
         }
 
         eraseBtn.addEventListener('click', () => {
-            if (isGameOver || isPaused || selectedCellsSet.size === 0) return;
-            const cellsArray = Array.from(selectedCellsSet).filter(idx => !initialClues[idx]);
+            if (isGameOver || isPaused || selectedCell === null) return;
+
+            let targetIndices = [];
+            if (multiSelectMode && notesMode && selectedCellsSet.size > 0) {
+                targetIndices = Array.from(selectedCellsSet);
+            } else {
+                targetIndices = [selectedCell];
+            }
+
+            const cellsArray = targetIndices.filter(idx => !initialClues[idx]);
             if (cellsArray.length === 0) return;
 
             history.push({
@@ -529,9 +563,7 @@
 
         hintBtn.addEventListener('click', () => {
             if (isGameOver || isPaused) return;
-            if (hintUsedThisStage) {
-                return;
-            }
+            if (hintUsedThisStage) return;
 
             let targetIdx = -1;
             if (selectedCell !== null && !initialClues[selectedCell] && board[selectedCell] !== solution[selectedCell]) {
@@ -546,7 +578,6 @@
             }
 
             if (targetIdx === -1) {
-                // If all incorrect cells are fixed, pick any empty cell
                 for (let i = 0; i < 81; i++) {
                     if (!initialClues[i] && board[i] === 0) {
                         targetIdx = i;
@@ -666,7 +697,6 @@
             return hash;
         }
 
-        // Check if a cell conflicts with Sudoku rules (same row, col, or 3x3 block)
         function isCellConflicting(idx) {
             const val = board[idx];
             if (val === 0) return false;
@@ -674,13 +704,11 @@
             const r = Math.floor(idx / 9);
             const c = idx % 9;
 
-            // Check row & col
             for (let i = 0; i < 9; i++) {
                 if (i !== c && board[r * 9 + i] === val) return true;
                 if (i !== r && board[i * 9 + c] === val) return true;
             }
 
-            // Check 3x3 block
             const boxR = Math.floor(r / 3) * 3;
             const boxC = Math.floor(c / 3) * 3;
             for (let br = boxR; br < boxR + 3; br++) {
@@ -751,7 +779,6 @@
                 master: 'Lv. 10 激ムズ'
             };
             
-            // Exact calibrated initial clue counts based on Master reference (21 clues)
             const clueCounts = {
                 easy: 42,
                 normal: 36,
@@ -848,7 +875,6 @@
             }
         }
 
-        // Win condition: Rule-based validation (accepts any valid Sudoku arrangement, not just the solution)
         function checkWinCondition() {
             for (let i = 0; i < 81; i++) {
                 if (board[i] === 0 || isCellConflicting(i)) return;
@@ -1097,14 +1123,12 @@
         }
 
         window.onload = function() {
-            // Ensure title screen is visible on launch and modals are hidden
             titleScreen.classList.remove('hidden');
             difficultyModal.classList.add('hidden');
             puzzleSelectModal.classList.add('hidden');
             pauseOverlay.classList.add('hidden');
             winOverlay.classList.add('hidden');
 
-            // Pre-generate puzzle in background so it's ready when user starts
             generateSudoku('easy', '#1001');
             renderBoard();
         };
